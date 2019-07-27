@@ -1,92 +1,124 @@
 package com.chatroom.demo.Handlers;
 
+import com.chatroom.demo.IllegalCharacterException;
 import com.chatroom.demo.Model.Chat;
 import com.chatroom.demo.Model.User;
+import com.chatroom.demo.Repos.ChatRepo;
+import com.chatroom.demo.Repos.UserRepo;
 
-import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.chatroom.demo.Handlers.UserLoader.filePath;
-
 public class ChatHandler {
-    //read and send msg
 
-    public static void list(String dir, List<File> fileList) {
-        File directory = new File(dir);
-        File[] list = directory.listFiles();
-        for (File files : list) {
-            if (files.isDirectory()) {
-                list(files.getAbsolutePath(), fileList);
-            } else if (files.isFile()) {
-                fileList.add(files);
-            }
-        }
+    private ChatRepo chatRepo;
+    private UserRepo userRepo;
+
+    public ChatHandler(ChatRepo chatRepo, UserRepo userRepo) {
+        this.chatRepo = chatRepo;
+        this.userRepo = userRepo;
     }
 
-    public static Chat saveChat(User user, String id, String message) {
-        //FriendLoader.loadFriends(user);
-        Chat c = new Chat(message, user, id);
-        ArrayList<User> friends = new ArrayList<>();
-//        User friend = new User(id);
-//        FriendLoader.loadFriends(friend);
-        friends.add(new User(id));
-        c.setRecipient(friends);
-        File newFriend = new File(filePath + user.getUsername() + "/" + id);
-        File saveFriend = new File(filePath + id + "/" + user.getUsername());
-        if (!newFriend.exists()) {
-            try {
-                newFriend.createNewFile();
-            } catch (IOException e) {
-                System.out.println("Error saving new chat - user(creation)");
+    public List<Chat> saveChat(String username, String recipient, String message) {
+        String originalId = username + "-" + recipient;
+        String otherId = recipient + "-" + username;
+        User user = this.userRepo.findUserByUsername(username);
+        User friend = this.userRepo.findUserByUsername(recipient);
+        ArrayList<User> recipients = new ArrayList<User>() {
+            {
+                add(friend);
             }
-        }
-        if (!saveFriend.exists()) {
-            try {
-                newFriend.createNewFile();
-            } catch (IOException e) {
-                System.out.println("Error saving new chat - friend(creation)");
+        };
+        this.chatRepo.insert(new Chat(message, originalId, user, recipients));
+        return this.chatRepo.findAllByRecIsInOrderByDate(new ArrayList<String>() {
+            {
+                add(originalId);
+                add(otherId);
             }
-        }
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(newFriend, true))) {
-            bw.write( "Me: " + message);
-            bw.newLine();
-        } catch (IOException e) {
-            System.out.println("Error saving new chat - user(writing)");
-        }
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(saveFriend, true))) {
-            bw.write(user.getUsername() + ": " + message);
-            bw.newLine();
-        } catch (IOException e) {
-            System.out.println("Error saving new chat - friend(writing)");
-        }
-        return c;
+        });
     }
 
-    public static Chat saveChatGroup(User user, String id, String message) {
-        //FriendLoader.loadFriends(user);
-        Chat c = new Chat(message, user, id);
-        ArrayList<User> recipients = new ArrayList<>();
-        List<File> groupFile = new ArrayList<>();
-        list(filePath, groupFile);
-        for (File f : groupFile) {
-            if (f.getName().equals(id)) {
-                try (BufferedWriter bw = new BufferedWriter(new FileWriter(f, true))) {
-                    if (f.getParentFile().getName().equals(user.getUsername())) {
-                        bw.write("Me: " + message);
-                    } else {
-//                        User friend = new User(f.getParentFile().getName());
-//                        FriendLoader.loadFriends(friend);
-                        recipients.add(new User(f.getParentFile().getName()));
-                        bw.write(user.getUsername() + ": " + message);
-                    }
-                    bw.newLine();
-                } catch (IOException e) {
-                    System.out.println("Error saving new chat(writing)");
-                }
+    public List<Chat> find(String id1, String id2) {
+        List<String> ids = new ArrayList<String>() {
+
+            {
+                add(id1);
+                add(id2);
+            }
+        };
+        return this.chatRepo.findAllByRecIsInOrderByDate(ids);
+
+    }
+
+    public List<Chat> saveGroupChat(String username, String gName, String message) {
+        User user = this.userRepo.findUserByUsername(username);
+        ArrayList<User> friends = this.chatRepo.findByMessageIsNullAndRecIs(gName).getRecipient();
+        this.chatRepo.insert(new Chat(message, gName, user, friends));
+        return this.chatRepo.findAllByMessageIsNotNullAndRecIsOrderByDate(gName);
+    }
+
+    public Chat createGroup(String username, ArrayList<String> friendNames, String gName) throws IllegalCharacterException {
+        if (gName.contains("-")) {
+            throw new IllegalCharacterException("Group names cannot contain the character \"-\"!");
+        }
+        friendNames.add(username);
+        ArrayList<User> members = new ArrayList<>();
+        for (String name : friendNames) {
+            User friend = this.userRepo.findUserByUsername(name);
+            members.add(friend);
+        }
+        return this.chatRepo.save(new Chat(gName, members));
+    }
+
+    //user can only request for chats with friends in their friendlist and groupchats where a chat
+    // exists, whose message field is null and the list of recipients contains the user
+
+    public List<Chat> findGroup(String gName) throws IllegalArgumentException {
+
+        Chat group = this.chatRepo.findByMessageIsNullAndRecIs(gName);
+        /*if (!group.getRecipient().contains(this.userRepo.findUserByUsername(username))) {
+            throw new IllegalArgumentException("This group does not exist!");
+        }*/
+        return this.chatRepo.findAllByMessageIsNotNullAndRecIsOrderByDate(gName);
+    }
+
+    //checks if a chat belongs to a group
+    public boolean isGroup(String id) {
+        return !id.contains("-");
+    }
+
+    public List<Chat> getAll() {
+        return this.chatRepo.findAll();
+    }
+
+    public void delAll() {
+        this.chatRepo.deleteAll();
+    }
+
+    public List<Chat> getGroups(String username) {
+        List<Chat> all = getAll();
+        List<Chat> gNames = new ArrayList<>();
+        for (Chat c : all) {
+            if (c.getMessage() == null && c.getRecipient().contains(this.userRepo.findUserByUsername(username))) {
+                gNames.add(c);
             }
         }
-        c.setRecipient(recipients);
-        return c;
+        return gNames;
     }
+
+    public List<Object> getChats(String username) {
+        List<Object> chats = new ArrayList<>();
+        List<User> friends = this.userRepo.findUserByUsername(username).getFriendList();
+        List<Chat> groups = getGroups(username);
+        for (User u : friends) {
+            chats.add(u);
+        }
+        for (Chat c: groups) {
+            chats.add(c);
+        }
+        return chats;
+
+
+    }
+
 }

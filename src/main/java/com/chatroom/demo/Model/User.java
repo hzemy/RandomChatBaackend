@@ -50,9 +50,10 @@ public class User {
         this.username = username;
         this.friendList = new ArrayList<>();
     }
-    //public User(){
 
-    //}
+    public User(){
+
+    }
 
     @Override
     public boolean equals(Object o) {

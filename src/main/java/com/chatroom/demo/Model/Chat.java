@@ -1,38 +1,56 @@
 package com.chatroom.demo.Model;
 
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.IndexDirection;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.UUID;
 
-//@Document(collection = "Chats")
+@Document(collection = "Chats")
 public class Chat {
     private String message;
     private ArrayList<User> recipient;
     private User sender;
-    private String id;
+    private String rec;
 
-    public Chat(User sender, ArrayList<User> recipient) {
-        this.recipient = recipient;
-        this.sender = sender;
-        if (recipient.size() == 1) {
-            this.id = recipient.get(0).getUsername();
-        } else {
-            this.id = UUID.randomUUID().toString();
-        }
+    public String getDate() {
+        return date;
     }
 
-    public Chat(String message, User sender, String id) {
+    public void setDate(String date) {
+        this.date = date;
+    }
+
+    @Indexed(direction = IndexDirection.ASCENDING)
+    private String date;
+
+    //store chats for individuals and groups
+    public Chat(String message, String id, User sender, ArrayList<User> recipient) {
         this.message = message;
+        this.rec = id;
         this.sender = sender;
-        this.id = id;
+        this.recipient = recipient;
+        Date date = new Date();
+        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+        this.date = formatter.format(date);
     }
 
-//    public Chat(String message, ArrayList<User> recipient, User sender) {
-//        this.message = message;
-//        this.recipient = recipient;
-//        this.sender = sender;
-//    }
+    //store the created group info
+    public Chat(String gName, ArrayList<User> members) {
+        this.rec = gName;
+        this.recipient = members;
+        Date date = new Date();
+        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+        this.date = formatter.format(date);    }
+
+    public Chat() {
+
+    }
 
     public void setMessage(String message) {
         this.message = message;
@@ -47,7 +65,7 @@ public class Chat {
     }
 
     public void setId(String id) {
-        this.id = id;
+        this.rec = id;
     }
 
     public String getMessage() {
@@ -63,6 +81,6 @@ public class Chat {
     }
 
     public String getId() {
-        return id;
+        return rec;
     }
 }
