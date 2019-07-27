@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface ChatRepo extends MongoRepository<Chat, String>, CrudRepository<Chat, String> {
+public interface ChatRepo extends MongoRepository<Chat, String> {
     List<Chat> findAllByRecIsInOrderByDate(List<String> ids);
     List<Chat> findAllByMessageIsNotNullAndRecIsOrderByDate(String gName);
     Chat findByMessageIsNullAndRecIs(String gName);
