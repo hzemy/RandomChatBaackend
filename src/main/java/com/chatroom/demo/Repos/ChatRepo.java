@@ -10,7 +10,6 @@ import java.util.List;
 @Repository
 public interface ChatRepo extends MongoRepository<Chat, String>, CrudRepository<Chat, String> {
     List<Chat> findAllByRecIsInOrderByDate(List<String> ids);
-    //List<Chat> findAllByRecIsOrderByDate(String gName);
     List<Chat> findAllByMessageIsNotNullAndRecIsOrderByDate(String gName);
     Chat findByMessageIsNullAndRecIs(String gName);
 

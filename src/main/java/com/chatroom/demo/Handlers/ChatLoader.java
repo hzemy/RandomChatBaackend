@@ -7,10 +7,10 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.chatroom.demo.Handlers.ChatHandler.list;
+//import static com.chatroom.demo.Handlers.ChatHandler.list;
 
 public class ChatLoader {
-    final static String filePath = "/Users/hzemy/IdeaProjects/src/";
+    /*final static String filePath = "/Users/hzemy/IdeaProjects/src/";
 
     public static boolean isGroup(String username, String friend) {
         User user = new User(username);
@@ -63,6 +63,6 @@ public class ChatLoader {
             System.out.println("Error loading chat.");
         }
         return chat;
-    }
+    }*/
 
 }

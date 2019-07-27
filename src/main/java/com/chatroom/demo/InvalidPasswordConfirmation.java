@@ -1,7 +1,5 @@
 package com.chatroom.demo;
 
-import java.awt.event.ActionEvent;
-
 public class InvalidPasswordConfirmation extends Exception{
     public InvalidPasswordConfirmation(String message) {
         super(message);
