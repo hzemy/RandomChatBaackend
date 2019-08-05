@@ -11,10 +11,6 @@ import java.util.Optional;
 public class UserHandler {
     private UserRepo userRepo;
 
-    public UserHandler() {
-
-    }
-
     public UserHandler(UserRepo userRepo) {
         this.userRepo = userRepo;
     }
@@ -45,7 +41,7 @@ public class UserHandler {
     public List<String> find() {
         List<User> all = this.userRepo.findAll();
         List<String> names = new ArrayList<>();
-        for (User u: all) {
+        for (User u : all) {
             names.add(u.getUsername() + " " + u.getPassword());
         }
         return names;
@@ -60,5 +56,9 @@ public class UserHandler {
                 add(new User(username, password));
             }
         };
+    }
+
+    public void del() {
+        this.userRepo.deleteAll();
     }
 }

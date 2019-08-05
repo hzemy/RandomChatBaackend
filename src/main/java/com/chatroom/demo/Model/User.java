@@ -16,13 +16,13 @@ public class User {
     private String password;
     private ArrayList<User> friendList;
 
-    public void setFriendList(ArrayList<User> friendList) { //
-        this.friendList = friendList; //
-    } //
+    public void setFriendList(ArrayList<User> friendList) {
+        this.friendList = friendList;
+    }
 
     public ArrayList<User> getFriendList() {
         return friendList;
-    } //
+    }
 
     public void setUsername(String username) {
         this.username = username;
@@ -51,7 +51,7 @@ public class User {
         this.friendList = new ArrayList<>();
     }
 
-    public User(){
+    public User() {
 
     }
 

@@ -6,8 +6,7 @@ import com.chatroom.demo.Model.User;
 import com.chatroom.demo.Repos.ChatRepo;
 import com.chatroom.demo.Repos.UserRepo;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class ChatHandler {
 
@@ -30,7 +29,7 @@ public class ChatHandler {
             }
         };
         this.chatRepo.insert(new Chat(message, originalId, user, recipients));
-        return this.chatRepo.findAllByRecIsInOrderByDate(new ArrayList<String>() {
+        return this.chatRepo.findAllByRecIsInOrderByDateDesc(new ArrayList<String>() {
             {
                 add(originalId);
                 add(otherId);
@@ -46,7 +45,7 @@ public class ChatHandler {
                 add(id2);
             }
         };
-        return this.chatRepo.findAllByRecIsInOrderByDate(ids);
+        return this.chatRepo.findAllByRecIsInOrderByDateDesc(ids);
 
     }
 
@@ -54,7 +53,7 @@ public class ChatHandler {
         User user = this.userRepo.findUserByUsername(username);
         ArrayList<User> friends = this.chatRepo.findByMessageIsNullAndRecIs(gName).getRecipient();
         this.chatRepo.insert(new Chat(message, gName, user, friends));
-        return this.chatRepo.findAllByMessageIsNotNullAndRecIsOrderByDate(gName);
+        return this.chatRepo.findAllByMessageIsNotNullAndRecIsOrderByDateDesc(gName);
     }
 
     public Chat createGroup(String username, ArrayList<String> friendNames, String gName) throws IllegalCharacterException {
@@ -79,7 +78,7 @@ public class ChatHandler {
         /*if (!group.getRecipient().contains(this.userRepo.findUserByUsername(username))) {
             throw new IllegalArgumentException("This group does not exist!");
         }*/
-        return this.chatRepo.findAllByMessageIsNotNullAndRecIsOrderByDate(gName);
+        return this.chatRepo.findAllByMessageIsNotNullAndRecIsOrderByDateDesc(gName);
     }
 
     //checks if a chat belongs to a group
@@ -106,18 +105,38 @@ public class ChatHandler {
         return gNames;
     }
 
-    public List<Object> getChats(String username) {
-        List<Object> chats = new ArrayList<>();
+    public Chat getLastText(List<String> rec) {
+        List<Chat> allChats = this.chatRepo.findAllByRecIsInOrderByDate(rec);
+        if (!(allChats.size() == 0)) {
+            return allChats.get(allChats.size() - 1);
+        } else {
+            return new Chat("", "", new User(), new ArrayList<>());
+        }
+
+    }
+
+    public List<Chat> getChats(String username) {
+        List<Chat> allChats = new ArrayList<>();
         List<User> friends = this.userRepo.findUserByUsername(username).getFriendList();
         List<Chat> groups = getGroups(username);
-        for (User u : friends) {
-            chats.add(u);
+        for (User friend : friends) {
+            List<String> ids = new ArrayList<String>() {
+                {
+                    add(username + "-" + friend.getUsername());
+                    add(friend.getUsername() + "-" + username);
+                }
+            };
+            allChats.add(new Chat(friend.getUsername() + "-" + username, getLastText(ids).getMessage(), getLastText(ids).getSender()));
         }
-        for (Chat c: groups) {
-            chats.add(c);
+        for (Chat c : groups) {
+            List<String> ids = new ArrayList<String>() {
+                {
+                    add(c.getId());
+                }
+            };
+            allChats.add(new Chat(c.getId(), getLastText(ids).getMessage(), getLastText(ids).getSender()));
         }
-        return chats;
-
+        return allChats;
 
     }
 

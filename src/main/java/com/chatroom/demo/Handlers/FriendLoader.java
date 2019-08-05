@@ -13,7 +13,7 @@ public class FriendLoader {
     public static void loadFriends(User user) {
         String line;
         try {
-            File friendList = new File(filePath + user.getUsername() +"/FriendsList");
+            File friendList = new File(filePath + user.getUsername() + "/FriendsList");
             BufferedReader br = new BufferedReader(new FileReader(friendList));
             while ((line = br.readLine()) != null) {
                 User f = new User(line);

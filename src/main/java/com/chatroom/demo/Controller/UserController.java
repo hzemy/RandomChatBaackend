@@ -29,7 +29,7 @@ public class UserController {
         return userHandler.signupUser(username, password, confirm);
     }
 
-    @RequestMapping("/User/delete") // send chat in group
+    @RequestMapping("/User/delete")
     public List<User> deleteByUsername(@RequestParam(value = "username") String username) {
         return userHandler.deleteAccount(username);
     }
@@ -37,5 +37,10 @@ public class UserController {
     @RequestMapping("/User/find")
     public List<String> userFind() {
         return this.userHandler.find();
+    }
+
+    @RequestMapping("/User/delAll")
+    public void deleteAll() {
+        this.userHandler.del();
     }
 }

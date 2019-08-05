@@ -17,10 +17,9 @@ public class FriendController {
         this.friendHandler = new FriendHandler(userRepo);
     }
 
-    //try returning sth, e.g. friend's name or the friend added
     @RequestMapping("/Friends/add")
     public List<User> addfriend(@RequestParam(value = "username") String username,
-                          @RequestParam(value = "friendName") String friendName) throws IllegalArgumentException {
+                                @RequestParam(value = "friendName") String friendName) throws IllegalArgumentException {
         friendHandler.addFriend(username, friendName);
         return friendHandler.addFriend(friendName, username);
     }

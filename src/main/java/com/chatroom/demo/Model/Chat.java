@@ -1,15 +1,12 @@
 package com.chatroom.demo.Model;
 
-import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.IndexDirection;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.UUID;
 
 @Document(collection = "Chats")
 public class Chat {
@@ -46,7 +43,15 @@ public class Chat {
         this.recipient = members;
         Date date = new Date();
         SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-        this.date = formatter.format(date);    }
+        this.date = formatter.format(date);
+    }
+
+    public Chat(String id, String message, User sender) {
+        this.rec = id;
+        this.message = message;
+        this.sender = sender;
+    }
+
 
     public Chat() {
 

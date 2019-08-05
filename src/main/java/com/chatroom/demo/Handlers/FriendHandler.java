@@ -14,7 +14,7 @@ public class FriendHandler {
     }
 
     //add, list, addrandom
-    public List<User> addRandom(String username) throws IllegalAccessException{
+    public List<User> addRandom(String username) throws IllegalAccessException {
         User user = this.userRepo.findUserByUsername(username);
         List<User> all = this.userRepo.findAll();
         List<User> notFriends = new ArrayList<>();
@@ -24,7 +24,7 @@ public class FriendHandler {
             }
         }
         if (notFriends.size() == 0) {
-            throw new IllegalAccessException("You are already friends with everybody using the app!");
+            throw new IllegalAccessException("Wow, you are already friends with everybody using the app!");
         }
         int r = (int) (Math.random() * notFriends.size() - 1);
         User friend = notFriends.get(r);
@@ -38,21 +38,21 @@ public class FriendHandler {
     }
 
     public List<User> addFriend(String username, String friendName) throws IllegalArgumentException, Error {
-            User user = this.userRepo.findUserByUsername(username);
-            User friend = this.userRepo.findUserByUsername(friendName);
-            if (user.equals(friend)) {
-                throw new IllegalArgumentException("You can't be friends with yourself :/");
-            }
-            if (user.getFriendList().contains(friend)) {
-                throw new IllegalArgumentException("You are already friends with " + friendName + "!");
-            }
+        User user = this.userRepo.findUserByUsername(username);
+        User friend = this.userRepo.findUserByUsername(friendName);
+        if (user.equals(friend)) {
+            throw new IllegalArgumentException("You can't be friends with yourself :/");
+        }
+        if (user.getFriendList().contains(friend)) {
+            throw new IllegalArgumentException("You are already friends with " + friendName + "!");
+        }
 
-            User newUser = new User(username, user.getPassword());
-            ArrayList<User> friendsOfUser = user.getFriendList();
-            friendsOfUser.add(friend);
-            newUser.setFriendList(friendsOfUser);
-            this.userRepo.save(newUser);
-            return this.userRepo.findAll();
+        User newUser = new User(username, user.getPassword());
+        ArrayList<User> friendsOfUser = user.getFriendList();
+        friendsOfUser.add(friend);
+        newUser.setFriendList(friendsOfUser);
+        this.userRepo.save(newUser);
+        return this.userRepo.findAll();
     }
 
     public List<User> getFriends(String username) {

@@ -7,10 +7,8 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-//import static com.chatroom.demo.Handlers.ChatHandler.list;
-
 public class ChatLoader {
-    /*final static String filePath = "/Users/hzemy/IdeaProjects/src/";
+    final static String filePath = "/Users/hzemy/IdeaProjects/src/";
 
     public static boolean isGroup(String username, String friend) {
         User user = new User(username);
@@ -27,7 +25,7 @@ public class ChatLoader {
 
     public static ArrayList<User> getGroupMembers(String id) {
         List<File> groupFile = new ArrayList<>();
-        list(filePath, groupFile);
+        //list(filePath, groupFile);
         ArrayList<User> friends = new ArrayList<>();
         for (File f : groupFile) {
             if (f.getName().equals(id)) {
@@ -47,7 +45,7 @@ public class ChatLoader {
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             String line;
             while ((line = br.readLine()) != null) {
-                Chat c = new Chat(line, user, id);
+                Chat c = new Chat(id, line, user);
                 ArrayList<User> friends = new ArrayList<>();
                 if (isGroup(user.getUsername(), id)) {
                     c.setRecipient(getGroupMembers(id));
@@ -63,6 +61,6 @@ public class ChatLoader {
             System.out.println("Error loading chat.");
         }
         return chat;
-    }*/
+    }
 
 }

@@ -60,28 +60,33 @@ public class ChatController {
         return chatHandler.getGroups(username);
     }
 
-
-    @RequestMapping("/Chat/all") // send chat in group
-    public List<Chat> getAll() {
-        return chatHandler.getAll();
-    }
-
-    @RequestMapping("/Chat/delete") // send chat in group
-    public void delAll() {
-        chatHandler.delAll();
-    }
-
-
-
+    // ----------------------------------
 
     @RequestMapping("/Chat/isGroup")
     public boolean isGroup(@RequestParam(value = "id") String id) {
         return chatHandler.isGroup(id);
     }
 
+
+    @RequestMapping("/Chat/all") // send chat in group
+    public List<Chat> getAll() {
+        return chatHandler.getAll();
+    }
+
+    @RequestMapping("/Chat/delete")
+    public void delAll() {
+        chatHandler.delAll();
+    }
+
+
     @RequestMapping("/Chat/getChats")
-    public List<Object> getChats(@RequestParam(value = "username") String username) {
+    public List<Chat> getChats(@RequestParam(value = "username") String username) {
         return chatHandler.getChats(username);
+    }
+
+    @RequestMapping("/Chat/getLastText")
+    public Chat getLastText(@RequestParam(value = "recs") List<String> recs) {
+        return chatHandler.getLastText(recs);
     }
 
 }
